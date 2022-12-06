@@ -19,166 +19,180 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <nav className="flex justify-between px-20 py-10">
-          <h1 className="flex gap-4 text-4xl font-bold text-[hsl(280,100%,70%)]">
-            <Image src={logo} alt="Logo" width={50} height={50} />
-            mailr
-          </h1>
-          <AuthShowcase />
-        </nav>
-        <div className="flex h-[80vh] items-center justify-between gap-10 px-20">
-          <div className="flex h-[80vh] max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 py-6 text-white">
-            <h2 className="w-80 text-lg font-medium text-white">
-              {"Upload Email Addresses (.csv)"}
-            </h2>
-            <CSVReader
-              onUploadAccepted={(results: { data: any[] }) => {
-                setData(results.data);
-              }}
-            >
-              {({
-                getRootProps,
-                acceptedFile,
-                ProgressBar,
-                getRemoveFileProps,
-              }: any) => (
-                <>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      {...getRootProps()}
-                      className="rounded-xl bg-white/20 px-4 py-2 text-white"
-                    >
-                      Browse file
-                    </button>
-                    {acceptedFile && (
-                      <div className="flex gap-2">
-                        <div>{acceptedFile && acceptedFile.name}</div>
-                        <button
-                          className=" text-red-500"
-                          {...getRemoveFileProps()}
-                        >
-                          x
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <ProgressBar className="bg-white" />
-                </>
-              )}
-            </CSVReader>
-            {/* table */}
-            {data.length > 0 && (
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="text-left">{data[0][0]}</th>
-                    <th className="text-left">{data[0][1]}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((row, index) => (
+        {sessionData ? (
+          <>
+            <nav className="flex justify-between px-20 py-10">
+              <h1 className="flex gap-4 text-4xl font-bold text-[hsl(280,100%,70%)]">
+                <Image src={logo} alt="Logo" width={50} height={50} />
+                mailr
+              </h1>
+              <AuthShowcase />
+            </nav>
+            <div className="flex h-[80vh] items-center justify-between gap-10 px-20">
+              <div className="flex h-[80vh] max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 py-6 text-white">
+                <h2 className="w-80 text-lg font-medium text-white">
+                  {"Upload Email Addresses (.csv)"}
+                </h2>
+                <CSVReader
+                  onUploadAccepted={(results: { data: any[] }) => {
+                    setData(results.data);
+                  }}
+                >
+                  {({
+                    getRootProps,
+                    acceptedFile,
+                    ProgressBar,
+                    getRemoveFileProps,
+                  }: any) => (
                     <>
-                      {index === 0 ? (
-                        <> </>
-                      ) : (
-                        <tr key={index}>
-                          <td className="text-left">{row[0]}</td>
-                          <td>{row[1]}</td>
-                        </tr>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          {...getRootProps()}
+                          className="rounded-xl bg-white/20 px-4 py-2 text-white"
+                        >
+                          Browse file
+                        </button>
+                        {acceptedFile && (
+                          <div className="flex gap-2">
+                            <div>{acceptedFile && acceptedFile.name}</div>
+                            <button
+                              className=" text-red-500"
+                              {...getRemoveFileProps()}
+                            >
+                              x
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <ProgressBar className="bg-white" />
                     </>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-          <div className="flex h-[80vh] w-full flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
-            <form
-              className="flex flex-col gap-6"
-              // onSubmit={handleSubmit(onSubmit)}
-            >
-              <label className="flex flex-col gap-2 text-sm">
-                From:
-                <input
-                  className="rounded-lg py-2 px-2 text-black"
-                  type="email"
-                  disabled
-                  value={sessionData?.user?.email ? sessionData.user.email : ""}
-                  // {...register("email")}
-                />
-                {/* {errors.email && (
+                  )}
+                </CSVReader>
+                {/* table */}
+                {data.length > 0 && (
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="text-left">{data[0][0]}</th>
+                        <th className="text-left">{data[0][1]}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.map((row, index) => (
+                        <>
+                          {index === 0 ? (
+                            <> </>
+                          ) : (
+                            <tr key={index}>
+                              <td className="text-left">{row[0]}</td>
+                              <td>{row[1]}</td>
+                            </tr>
+                          )}
+                        </>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+              <div className="flex h-[80vh] w-full flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
+                <form
+                  className="flex flex-col gap-6"
+                  // onSubmit={handleSubmit(onSubmit)}
+                >
+                  <label className="flex flex-col gap-2 text-sm">
+                    From:
+                    <input
+                      className="rounded-lg py-2 px-2 text-black"
+                      type="email"
+                      disabled
+                      value={
+                        sessionData?.user?.email ? sessionData.user.email : ""
+                      }
+                      // {...register("email")}
+                    />
+                    {/* {errors.email && (
                   <p className="text-xs text-red-500">
                     {errors.email?.message}
                   </p>
                 )} */}
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                To:
-                <input
-                  className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
-                  type="email"
-                  // {...register("password")}
-                />
-                {/* {errors.password && (
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm">
+                    To:
+                    <input
+                      className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
+                      type="email"
+                      // {...register("password")}
+                    />
+                    {/* {errors.password && (
                   <p className="text-xs text-red-500">
                     {errors.password?.message}
                   </p>
                 )} */}
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                Mail Body:
-                <textarea
-                  className="h-[30vh] rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
-                  // {...register("password")}
-                />
-                {/* {errors.password && (
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm">
+                    Mail Body:
+                    <textarea
+                      className="h-[30vh] rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
+                      // {...register("password")}
+                    />
+                    {/* {errors.password && (
                   <p className="text-xs text-red-500">
                     {errors.password?.message}
                   </p>
                 )} */}
-              </label>
-              <label className="flex flex-col gap-2 text-sm hover:cursor-pointer">
-                Add any attachments:
-                <input
-                  className="
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm hover:cursor-pointer">
+                    Add any attachments:
+                    <input
+                      className="
                   rounded-lg py-2 px-2 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-white/20 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-white/30"
-                  type="file"
-                  // {...register("password")}
-                />
-                {/* {errors.password && (
+                      type="file"
+                      // {...register("password")}
+                    />
+                    {/* {errors.password && (
                   <p className="text-xs text-red-500">
                     {errors.password?.message}
                   </p>
                 )} */}
-              </label>
-              <button
-                // onClick={() => setValue("type", "USER")}
-                className="rounded-xl bg-white/20 px-4 py-2 text-white"
-                // disabled={otpMutation.isLoading}
-                type="submit"
-              >
-                Mail
-              </button>
-              {/* {otpMutation.error && (
+                  </label>
+                  <button
+                    // onClick={() => setValue("type", "USER")}
+                    className="rounded-xl bg-white/20 px-4 py-2 text-white"
+                    // disabled={otpMutation.isLoading}
+                    type="submit"
+                  >
+                    Mail
+                  </button>
+                  {/* {otpMutation.error && (
                 <p className="rounded-lg border-2 border-red-500 bg-red-200 p-2 text-sm text-red-600">
                   Something went wrong! {otpMutation.error.message}
                 </p>
               )} */}
-              {/* {loggingErrors && (
+                  {/* {loggingErrors && (
                 <p className="rounded-lg border-2 border-red-500 bg-red-200 p-2 text-sm text-red-600">
                   Something went wrong! {loggingErrors}
                 </p>
               )} */}
-              <Link href="/">
-                <span className="cursor-pointer text-center text-sm text-purple-700">
-                  Don&apos;t have an idea how this works? Check out this short
-                  tutorial!
-                </span>
-              </Link>
-            </form>
-          </div>
-        </div>
+                  <Link href="/">
+                    <span className="cursor-pointer text-center text-sm text-purple-700">
+                      Don&apos;t have an idea how this works? Check out this
+                      short tutorial!
+                    </span>
+                  </Link>
+                </form>
+              </div>
+            </div>
+          </>
+        ) : (
+          <nav className="flex h-screen flex-col items-center justify-center gap-8 px-20 py-10">
+            <h1 className="flex gap-4 text-4xl font-bold text-[hsl(280,100%,70%)]">
+              <Image src={logo} alt="Logo" width={50} height={50} />
+              mailr
+            </h1>
+            <AuthShowcase />
+          </nav>
+        )}
       </main>
     </>
   );
