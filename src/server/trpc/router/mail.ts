@@ -25,7 +25,15 @@ export const mailRouter = router({
         body,
         attachment,
       };
-      sendEmail(args);
+      const res = await sendEmail(args);
+
+      if (!res || res.success === false) {
+        throw new trpc.TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not send email",
+        });
+      }
+
       return {
         message: `Email sent to ${to}`,
       };
