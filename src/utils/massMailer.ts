@@ -58,35 +58,21 @@ export const sendMassMails = async ({
   }
 
   // send a mail to the user with the status of all the emails sent
-  let mailConfig = {};
-
-  if (env.NODE_ENV === "production") {
-    mailConfig = {
-      host: "smtp.mail.me.com",
-      port: 587,
-      secure: false,
-      tls: {
-        ciphers: "SSLv3",
-        rejectUnauthorized: false,
-      },
-      auth: {
-        user: "guntupallijaideep@icloud.com",
-        pass: env.EMAIL_PASS,
-      },
-      debug: true,
-      logger: true,
-    };
-  } else {
-    const testAccount = await nodemailer.createTestAccount();
-    mailConfig = {
-      host: "smtp.ethereal.email",
-      port: 587,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    };
-  }
+  const mailConfig = {
+    host: "smtp.mail.me.com",
+    port: 587,
+    secure: false,
+    tls: {
+      ciphers: "SSLv3",
+      rejectUnauthorized: false,
+    },
+    auth: {
+      user: "guntupallijaideep@icloud.com",
+      pass: env.EMAIL_PASS,
+    },
+    debug: true,
+    logger: true,
+  };
 
   const transporter = nodemailer.createTransport(mailConfig);
 
@@ -119,7 +105,7 @@ export const sendMassMails = async ({
 
   const mail = await transporter.sendMail(mailOptions);
 
-  console.log("Message sent: %s", nodemailer.getTestMessageUrl(mail));
+  console.log("Message sent: %s", mail.messageId);
 
   return {
     success: true,
