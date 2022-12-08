@@ -33,12 +33,43 @@ const Home: NextPage = () => {
     },
   });
 
+  const getPresignedUrlMutation = trpc.mail.createPresignedUrl.useMutation();
+
   const onSubmit = useCallback(
     async (data: MailOpts) => {
       console.log(data);
-      await sendMailMutation.mutateAsync(data);
+
+      const { url, fields }: { url: string; fields: any } =
+        (await getPresignedUrlMutation.mutateAsync()) as any;
+
+      const fdata = {
+        ...fields,
+        file: data.attachment[0],
+      };
+      const formData = new FormData();
+
+      Object.keys(fdata).forEach((key) => {
+        formData.append(key, fdata[key]);
+      });
+
+      await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      const newData = {
+        to: data.to,
+        subject: data.subject,
+        body: data.body,
+        attachment: {
+          path: `https://mailr-attachments.s3.us-west-2.amazonaws.com/${fields.key}`,
+          filename: data.attachment[0].name,
+        },
+      };
+
+      await sendMailMutation.mutateAsync(newData);
     },
-    [sendMailMutation]
+    [getPresignedUrlMutation, sendMailMutation]
   );
 
   return (
@@ -170,7 +201,7 @@ const Home: NextPage = () => {
                   <label className="flex flex-col gap-2 text-sm">
                     Mail Body:
                     <textarea
-                      className="h-[30vh] rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
+                      className="h-[20vh] rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
                       {...register("body")}
                     />
                     {errors.body && (
@@ -185,13 +216,13 @@ const Home: NextPage = () => {
                       className="
                   rounded-lg py-2 px-2 text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-white/20 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-white/30"
                       type="file"
-                      // {...register("password")}
+                      {...register("attachment")}
                     />
-                    {/* {errors.password && (
-                  <p className="text-xs text-red-500">
-                    {errors.password?.message}
-                  </p>
-                )} */}
+                    {errors.attachment && (
+                      <p className="text-xs text-red-500">
+                        {JSON.stringify(errors.attachment.message)}
+                      </p>
+                    )}
                   </label>
                   <button
                     className="rounded-xl bg-white/20 px-4 py-2 text-white disabled:text-red-500"

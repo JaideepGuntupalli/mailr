@@ -21,6 +21,10 @@ export const serverSchema = z.object({
   ),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  ACCESS_KEY_ID_AWS: z.string(),
+  SECRET_ACCESS_KEY_AWS: z.string(),
+  REGION_AWS: z.string(),
+  AWS_BUCKET_NAME: z.string(),
 });
 
 /**

@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { sendEmail } from "../../../utils/mailer";
-import { mailOptions } from "../../../utils/validation/mail";
+import * as trpc from "@trpc/server";
+import { mailUrlOptions } from "../../../utils/validation/mail";
 
 import { router, publicProcedure } from "../trpc";
+import { env } from "../../../env/server.mjs";
 
 export const mailRouter = router({
   hello: publicProcedure
@@ -12,17 +14,50 @@ export const mailRouter = router({
         greeting: `Hello ${input?.text ?? "world"}`,
       };
     }),
-  send: publicProcedure.input(mailOptions).mutation(async ({ input, ctx }) => {
-    const { to, subject, body } = input;
-    const args = {
-      session: ctx.session,
-      to,
-      subject,
-      body,
+  send: publicProcedure
+    .input(mailUrlOptions)
+    .mutation(async ({ input, ctx }) => {
+      const { to, subject, body, attachment } = input;
+      const args = {
+        session: ctx.session,
+        to,
+        subject,
+        body,
+        attachment,
+      };
+      sendEmail(args);
+      return {
+        message: `Email sent to ${to}`,
+      };
+    }),
+  createPresignedUrl: publicProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.session) {
+      throw new trpc.TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Not authenticated",
+      });
+    }
+
+    const params = {
+      Bucket: env.AWS_BUCKET_NAME,
+      Fields: {
+        key: `${ctx.session.user?.id}/${Date.now()}`,
+      },
+      Expires: 60,
+      Conditions: [
+        ["content-length-range", 0, 1048576], // up to 1 MB
+      ],
     };
-    sendEmail(args);
-    return {
-      message: `Email sent to ${to}`,
-    };
+
+    const uploadUrl = await ctx.s3.createPresignedPost(params);
+
+    if (!uploadUrl) {
+      throw new trpc.TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Could not create presigned URL",
+      });
+    }
+
+    return uploadUrl;
   }),
 });

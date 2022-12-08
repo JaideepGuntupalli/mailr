@@ -9,11 +9,16 @@ export const sendEmail = async ({
   to,
   subject,
   body,
+  attachment,
 }: {
   session: any;
   to: string;
   subject: string;
   body: string;
+  attachment: {
+    filename: string;
+    path: string;
+  };
 }) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -30,12 +35,29 @@ export const sendEmail = async ({
     },
   });
 
-  const mailOptions = {
-    from: `"${session.user.name}" <${session.user.email}>`,
-    to: to,
-    subject: subject,
-    text: body,
-  };
+  const mailOptions = {};
+
+  if (attachment) {
+    Object.assign(mailOptions, {
+      from: `"${session.user.name}" <${session.user.email}>`,
+      to: to,
+      subject: subject,
+      text: body,
+      attachments: [
+        {
+          filename: attachment.filename,
+          path: attachment.path,
+        },
+      ],
+    });
+  } else {
+    Object.assign(mailOptions, {
+      from: `"${session.user.name}" <${session.user.email}>`,
+      to: to,
+      subject: subject,
+      text: body,
+    });
+  }
 
   const mail = await transporter.sendMail(mailOptions);
 
