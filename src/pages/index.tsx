@@ -4,13 +4,43 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useCSVReader } from "react-papaparse";
 import logo from "./../../public/logo.png";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
+import type { MailOpts } from "../utils/validation/mail";
+import { mailOptions } from "../utils/validation/mail";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const { CSVReader } = useCSVReader();
   const [data, setData] = useState<any[]>([]);
   const { data: sessionData } = useSession();
+  const [resultStr, setResultStr] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<MailOpts>({
+    resolver: zodResolver(mailOptions),
+  });
+
+  const sendMailMutation = trpc.mail.send.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      setResultStr(data.message);
+    },
+  });
+
+  const onSubmit = useCallback(
+    async (data: MailOpts) => {
+      console.log(data);
+      await sendMailMutation.mutateAsync(data);
+    },
+    [sendMailMutation]
+  );
+
   return (
     <>
       <Head>
@@ -98,7 +128,7 @@ const Home: NextPage = () => {
               <div className="flex h-[80vh] w-full flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
                 <form
                   className="flex flex-col gap-6"
-                  // onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleSubmit(onSubmit)}
                 >
                   <label className="flex flex-col gap-2 text-sm">
                     From:
@@ -109,38 +139,45 @@ const Home: NextPage = () => {
                       value={
                         sessionData?.user?.email ? sessionData.user.email : ""
                       }
-                      // {...register("email")}
                     />
-                    {/* {errors.email && (
-                  <p className="text-xs text-red-500">
-                    {errors.email?.message}
-                  </p>
-                )} */}
                   </label>
                   <label className="flex flex-col gap-2 text-sm">
                     To:
                     <input
                       className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
                       type="email"
-                      // {...register("password")}
+                      {...register("to")}
                     />
-                    {/* {errors.password && (
-                  <p className="text-xs text-red-500">
-                    {errors.password?.message}
-                  </p>
-                )} */}
+                    {errors.to && (
+                      <p className="text-xs text-red-500">
+                        {errors.to?.message}
+                      </p>
+                    )}
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm">
+                    Subject:
+                    <input
+                      className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
+                      type="text"
+                      {...register("subject")}
+                    />
+                    {errors.subject && (
+                      <p className="text-xs text-red-500">
+                        {errors.subject?.message}
+                      </p>
+                    )}
                   </label>
                   <label className="flex flex-col gap-2 text-sm">
                     Mail Body:
                     <textarea
                       className="h-[30vh] rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
-                      // {...register("password")}
+                      {...register("body")}
                     />
-                    {/* {errors.password && (
-                  <p className="text-xs text-red-500">
-                    {errors.password?.message}
-                  </p>
-                )} */}
+                    {errors.body && (
+                      <p className="text-xs text-red-500">
+                        {errors.body?.message}
+                      </p>
+                    )}
                   </label>
                   <label className="flex flex-col gap-2 text-sm hover:cursor-pointer">
                     Add any attachments:
@@ -157,30 +194,29 @@ const Home: NextPage = () => {
                 )} */}
                   </label>
                   <button
-                    // onClick={() => setValue("type", "USER")}
-                    className="rounded-xl bg-white/20 px-4 py-2 text-white"
-                    // disabled={otpMutation.isLoading}
+                    className="rounded-xl bg-white/20 px-4 py-2 text-white disabled:text-red-500"
+                    disabled={sendMailMutation.isLoading}
                     type="submit"
                   >
                     Mail
                   </button>
-                  {/* {otpMutation.error && (
-                <p className="rounded-lg border-2 border-red-500 bg-red-200 p-2 text-sm text-red-600">
-                  Something went wrong! {otpMutation.error.message}
-                </p>
-              )} */}
-                  {/* {loggingErrors && (
-                <p className="rounded-lg border-2 border-red-500 bg-red-200 p-2 text-sm text-red-600">
-                  Something went wrong! {loggingErrors}
-                </p>
-              )} */}
-                  <Link href="/">
-                    <span className="cursor-pointer text-center text-sm text-purple-700">
-                      Don&apos;t have an idea how this works? Check out this
-                      short tutorial!
-                    </span>
-                  </Link>
+                  {sendMailMutation.error && (
+                    <p className="rounded-lg border-2 border-red-500 bg-red-200 p-2 text-sm text-red-600">
+                      Something went wrong! {sendMailMutation.error.message}
+                    </p>
+                  )}
+                  {resultStr !== "" && (
+                    <p className="rounded-lg border-2 border-green-500 bg-green-200 p-2 text-sm text-green-600">
+                      Success! {resultStr}
+                    </p>
+                  )}
                 </form>
+                <Link href="/">
+                  <span className="cursor-pointer text-center text-sm text-purple-700">
+                    Don&apos;t have an idea how this works? Check out this short
+                    tutorial!
+                  </span>
+                </Link>
               </div>
             </div>
           </>
