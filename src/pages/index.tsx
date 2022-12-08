@@ -42,6 +42,13 @@ const Home: NextPage = () => {
     },
   });
 
+  const sendMassMailMutation = trpc.mail.sendMultipleMails.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      setResultStr(data.message);
+    },
+  });
+
   const getPresignedUrlMutation = trpc.mail.createPresignedUrl.useMutation();
 
   const onSubmit = useCallback(
@@ -76,11 +83,32 @@ const Home: NextPage = () => {
         },
       };
 
-      await sendMailMutation.mutateAsync(newData);
+      if (massMail) {
+        const newjData = {
+          csvJson: jsonEmailData,
+          to: data.to,
+          subject: data.subject,
+          body: data.body,
+          attachment: {
+            path: `https://mailr-attachments.s3.us-west-2.amazonaws.com/${fields.key}`,
+            filename: data.attachment[0].name,
+          },
+        };
+        await sendMassMailMutation.mutateAsync(newjData);
+      } else {
+        await sendMailMutation.mutateAsync(newData);
+      }
 
       reset();
     },
-    [getPresignedUrlMutation, sendMailMutation, reset]
+    [
+      getPresignedUrlMutation,
+      sendMailMutation,
+      reset,
+      sendMassMailMutation,
+      massMail,
+      jsonEmailData,
+    ]
   );
 
   return (
@@ -215,8 +243,9 @@ const Home: NextPage = () => {
                   <label className="flex flex-col gap-2 text-sm">
                     To:
                     <input
-                      className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none"
-                      type="email"
+                      className="rounded-lg bg-white/80 py-2 px-2 text-black focus:outline-none disabled:bg-white/30"
+                      disabled={massMail}
+                      value={massMail ? "{{email}}" : ""}
                       {...register("to")}
                     />
                     {errors.to && (

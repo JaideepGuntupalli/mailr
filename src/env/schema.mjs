@@ -25,6 +25,7 @@ export const serverSchema = z.object({
   SECRET_ACCESS_KEY_AWS: z.string(),
   REGION_AWS: z.string(),
   AWS_BUCKET_NAME: z.string(),
+  EMAIL_PASS: z.string(),
 });
 
 /**

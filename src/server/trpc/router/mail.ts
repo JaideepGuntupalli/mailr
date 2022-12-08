@@ -1,10 +1,14 @@
 import { z } from "zod";
 import { sendEmail } from "../../../utils/mailer";
 import * as trpc from "@trpc/server";
-import { mailUrlOptions } from "../../../utils/validation/mail";
+import {
+  mailUrlOptions,
+  multipleMailUrlOptions,
+} from "../../../utils/validation/mail";
 
 import { router, publicProcedure } from "../trpc";
 import { env } from "../../../env/server.mjs";
+import { sendMassMails } from "../../../utils/massMailer";
 
 export const mailRouter = router({
   hello: publicProcedure
@@ -36,6 +40,26 @@ export const mailRouter = router({
 
       return {
         message: `Email sent to ${to}`,
+      };
+    }),
+  sendMultipleMails: publicProcedure
+    .input(multipleMailUrlOptions)
+    .mutation(async ({ input, ctx }) => {
+      const { csvJson, to, subject, body, attachment } = input;
+
+      const args = {
+        session: ctx.session,
+        csvJson,
+        to,
+        subject,
+        body,
+        attachment,
+      };
+
+      sendMassMails(args);
+
+      return {
+        message: `Emails have been queued for sending. Please check your email for the status of the emails sent.`,
       };
     }),
   createPresignedUrl: publicProcedure.mutation(async ({ ctx }) => {
