@@ -56,10 +56,17 @@ export const mailRouter = router({
         attachment,
       };
 
-      sendMassMails(args);
+      const res = await sendMassMails(args);
+
+      if (!res || res.success === false) {
+        throw new trpc.TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not send email",
+        });
+      }
 
       return {
-        message: `Emails have been queued for sending. Please check your email for the status of the emails sent.`,
+        message: `Emails have been sent.`,
       };
     }),
   createPresignedUrl: publicProcedure.mutation(async ({ ctx }) => {

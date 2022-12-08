@@ -120,4 +120,8 @@ export const sendMassMails = async ({
   const mail = await transporter.sendMail(mailOptions);
 
   console.log("Message sent: %s", nodemailer.getTestMessageUrl(mail));
+
+  return {
+    success: true,
+  };
 };

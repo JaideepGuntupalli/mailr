@@ -297,7 +297,8 @@ const Home: NextPage = () => {
                     className="rounded-xl bg-white/20 px-4 py-2 text-white disabled:animate-pulse disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/50"
                     disabled={
                       sendMailMutation.isLoading ||
-                      getPresignedUrlMutation.isLoading
+                      getPresignedUrlMutation.isLoading ||
+                      sendMassMailMutation.isLoading
                     }
                     type="submit"
                   >
@@ -311,6 +312,12 @@ const Home: NextPage = () => {
                   {resultStr !== "" && (
                     <p className="rounded-lg border-2 border-green-500 bg-green-200 p-2 text-sm text-green-600">
                       Success! {resultStr}
+                    </p>
+                  )}
+                  {sendMassMailMutation.isLoading && (
+                    <p className="rounded-lg border-2 border-yellow-500 bg-yellow-200 p-2 text-sm text-yellow-600">
+                      Waiting! Emails are being sent. Please wait for a few
+                      minutes. Dont close the tab.
                     </p>
                   )}
                 </form>
