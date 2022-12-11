@@ -1,28 +1,34 @@
-# Create T3 App
+# ✉️ [mailr](https://mailr.gjd.one)
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is the code base of [mailr](https://mailr.gjd.one)
 
-## What's next? How do I make an app with this?
+## Table of contents
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- [✉️ mailr](#️-mailr)
+  - [Table of contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Relavent Links](#relavent-links)
+  - [Built with](#built-with)
+  - [License](#license)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Overview
+
+A web app through which you can send custom mails to a large amount users with their data as csv. You can also just send mail a single person(cus y not?). You insert their name as variable to into subject or body. You can also add attachments. When all mails are sent to the sender you will receive a report as mail about how each persons mail status.
+
+## Relavent Links
+
+- Website: [Link to Deployment](https://jaideepguntupalli.com)
+- Tutorial: [Loom Link](https://www.loom.com/share/fa5269c48ec8402ca4419a14e54f61a5)
+
+## Built with
+
+[T3 Stack](https://create.t3.gg/)
 
 - [Next.js](https://nextjs.org)
 - [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
-## Learn More
+## License
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+[MIT][license]
