@@ -16,6 +16,21 @@ export const mailRouter = router({
         greeting: `Hello ${input?.text ?? "world"}`,
       };
     }),
+  test: publicProcedure.query(async ({ input }) => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+
+    const res = await fetch(
+      `${env.MAIL_API_LINK}/test`,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      requestOptions
+    );
+
+    return res.text();
+  }),
   send: publicProcedure
     .input(mailUrlOptions)
     .mutation(async ({ input, ctx }) => {
@@ -65,7 +80,7 @@ export const mailRouter = router({
       // const res = await sendMassMails(args);
       console.log(JSON.stringify(args));
 
-      const res = fetch(`${env.MAIL_API_LINK}/mulmail`, {
+      const res = await fetch(`${env.MAIL_API_LINK}/mulmail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,8 +88,15 @@ export const mailRouter = router({
         body: JSON.stringify(args),
       });
 
+      if (res.status !== 200) {
+        throw new trpc.TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not send emails",
+        });
+      }
+
       return {
-        message: `Emails have been queued. You will be notified when they are sent with a report of their status via mail.`,
+        message: `Emails have been queued. You will be notified when they are sent with a report of their status via mail.${res.text()}`,
       };
     }),
   createPresignedUrl: publicProcedure.mutation(async ({ ctx }) => {
