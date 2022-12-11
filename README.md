@@ -31,4 +31,4 @@ A web app through which you can send custom mails to a large amount users with t
 
 ## License
 
-[MIT][license]
+[MIT](LICENSE)
