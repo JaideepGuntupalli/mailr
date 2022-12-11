@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { sendEmail } from "../../../utils/mailer";
 import * as trpc from "@trpc/server";
 import {
   mailUrlOptions,
@@ -8,7 +7,6 @@ import {
 
 import { router, publicProcedure } from "../trpc";
 import { env } from "../../../env/server.mjs";
-import { sendMassMails } from "../../../utils/massMailer";
 
 export const mailRouter = router({
   hello: publicProcedure
@@ -29,9 +27,17 @@ export const mailRouter = router({
         body,
         attachment,
       };
-      const res = await sendEmail(args);
 
-      if (!res || res.success === false) {
+      // make a post request to "http://localhost:3000/onemail" with the args
+      const res = await fetch(`${env.MAIL_API_LINK}/onemail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(args),
+      });
+
+      if (res.status !== 200) {
         throw new trpc.TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Could not send email",
@@ -56,17 +62,19 @@ export const mailRouter = router({
         attachment,
       };
 
-      const res = await sendMassMails(args);
+      // const res = await sendMassMails(args);
+      console.log(JSON.stringify(args));
 
-      if (!res || res.success === false) {
-        throw new trpc.TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Could not send email",
-        });
-      }
+      const res = fetch(`${env.MAIL_API_LINK}/mulmail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(args),
+      });
 
       return {
-        message: `Emails have been sent.`,
+        message: `Emails have been queued. You will be notified when they are sent with a report of their status via mail.`,
       };
     }),
   createPresignedUrl: publicProcedure.mutation(async ({ ctx }) => {
