@@ -1,4 +1,4 @@
-# ✉️ [mailr](https://mailr.gjd.one)
+# 📩 [mailr](https://mailr.gjd.one)
 
 This is the code base of [mailr](https://mailr.gjd.one)
 
