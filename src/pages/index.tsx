@@ -321,12 +321,16 @@ const Home: NextPage = () => {
                     </p>
                   )}
                 </form>
-                <Link href="/">
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://www.loom.com/share/fa5269c48ec8402ca4419a14e54f61a5"
+                >
                   <span className="cursor-pointer text-center text-sm text-purple-700">
                     Don&apos;t have an idea how this works? Check out this short
                     tutorial!
                   </span>
-                </Link>
+                </a>
               </div>
             </div>
           </>
